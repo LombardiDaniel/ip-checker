@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  requester:
+    container_name: ip_checker
+    image: lombardi/ip-checker:latest
+    restart: unless-stopped
+    volumes:
+      - last_ip:/cmd/
+    env_file:
+      - .env
+
+volumes:
+  last_ip:

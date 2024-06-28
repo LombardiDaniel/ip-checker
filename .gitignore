@@ -8,6 +8,10 @@
 *.so
 *.dylib
 
+last_ip.txt
+
+.env
+
 # Test binary, built with `go test -c`
 *.test
 
