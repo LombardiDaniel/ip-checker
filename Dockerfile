@@ -1,16 +1,3 @@
-#### - TESTS - ####
-FROM golang:1.22.3 AS tester
-
-WORKDIR /cmd
-
-COPY cmd/go.mod go.mod
-COPY cmd/go.sum go.sum
-RUN go mod download
-
-COPY cmd/ ./
-
-CMD ["go", "test", "-v", "./..."]
-
 #### - BUILDER - ####
 FROM golang:1.22.3 AS builder
 
@@ -34,9 +21,7 @@ WORKDIR /cmd
 
 COPY --from=builder /bin/main ./main
 
-RUN adduser --system --no-create-home nonroot
-USER nonroot
-
-EXPOSE 9111
+# RUN adduser --system --no-create-home nonroot
+# USER nonroot
 
 CMD ["./main"]
