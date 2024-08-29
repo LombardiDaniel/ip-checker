@@ -3,7 +3,10 @@ version: "3.7"
 services:
   requester:
     container_name: ip_checker
-    image: lombardi/ip-checker:latest
+    # image: lombardi/ip-checker:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
       - last_ip:/cmd/
