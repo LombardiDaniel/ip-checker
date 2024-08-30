@@ -21,7 +21,9 @@ WORKDIR /cmd
 
 COPY --from=builder /bin/main ./main
 
-# RUN adduser --system --no-create-home nonroot
+# RUN adduser --system --no-create-home nonroot && \
+#     chmod -R a+rw /cmd
+
 # USER nonroot
 
 CMD ["./main"]

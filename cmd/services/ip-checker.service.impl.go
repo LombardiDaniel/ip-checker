@@ -9,11 +9,11 @@ import (
 	"os"
 )
 
-const ipFilePath 		string = "./last_ip.txt"
-const checkIpUrl	string = "https://checkip.amazonaws.com"
+const ipFilePath string = "./last_ip.txt"
+const checkIpUrl string = "https://checkip.amazonaws.com"
 
 type IpCheckerServiceImpl struct {
-	httpClient 			*http.Client
+	httpClient *http.Client
 }
 
 func NewIpCheckerImpl() IpCheckerService {
@@ -22,54 +22,52 @@ func NewIpCheckerImpl() IpCheckerService {
 	}
 }
 
-func (s *IpCheckerServiceImpl) GetCurrIp() (*string, error) {
+func (s *IpCheckerServiceImpl) GetCurrIp() (string, error) {
 	resp, err := s.httpClient.Get(checkIpUrl)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer resp.Body.Close()
 
-    body, err := io.ReadAll(resp.Body)
-    if err != nil {
-        slog.Error(fmt.Sprintf("Error reading response body: '%s'", err))
-        return nil, err
-    }
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		slog.Error(fmt.Sprintf("Error reading response body: '%s'", err))
+		return "", err
+	}
 
 	if resp.StatusCode != 200 {
 		slog.Error(fmt.Sprintf("StatusCode != 200: '%d', body: %s", resp.StatusCode, string(body)))
-        return nil, errors.New("return code != 200")
+		return "", errors.New("return code != 200")
 	}
 
 	bodyStr := string(body[:len(body)-1]) // we cut out the '\n' from the msg
-	return &bodyStr, nil
+	return bodyStr, nil
 }
 
 func (s *IpCheckerServiceImpl) StoreIp(ip string) error {
 	err := os.WriteFile(ipFilePath, []byte(ip), 0644)
-    if err!= nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
 
-func (s *IpCheckerServiceImpl) ReadOldIp() (*string, error) {
+func (s *IpCheckerServiceImpl) ReadOldIp() (string, error) {
 
 	_, err := os.Stat(ipFilePath)
 	if errors.Is(err, os.ErrNotExist) {
 		_, err = os.Create(ipFilePath)
 		if err != nil {
 			err = errors.Join(err, errors.New("could not create file"))
-			return nil, err
+			return "", err
 		}
 	}
 
 	data, err := os.ReadFile(ipFilePath)
-    if err!= nil {
-        return nil, err
-    }
+	if err != nil {
+		return "", err
+	}
 
-    ip := string(data)
-
-    return &ip, nil
+	return string(data), nil
 }
